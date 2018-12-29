@@ -11,7 +11,8 @@ export default class CreateGame extends Component {
       player1:'',
       player2:'',
       isSubmitting: false,
-      gameId: null
+      gameId: null,
+      failedToCreate: false
     }
   }
 
@@ -32,17 +33,22 @@ export default class CreateGame extends Component {
     (async function() {
       const result = await createGame(obj);
       if (result)
-        this.setState({ isSubmitting: false, gameId: result._id })
+        this.setState({ gameId: result._id })
+      else 
+        this.setState({ failedToCreate: true })
+      this.setState({ isSubmitting: false });
       console.log(result);
     }).bind(this)();
   }
 
   render() {
+    const { failedToCreate } = this.state;
     return !this.state.gameId ?
     (
       <div className = "container">
         <Link to="/">Go back</Link>
         <form onSubmit = {(event) => this.handleSubmit(event)}>
+          { failedToCreate && <h3 className = "text-center text-danger">Couldn't create game</h3> }
           <div className="form-group">
             <label htmlFor="player1">Player 1 (X)</label>
             <input

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, Redirect } from 'react-router-dom';
 import {  getGameById, updateGameHistory, updateGameStatus } from '../../http/game';
 
 import './gameboard.css';
@@ -50,22 +50,29 @@ export default class GameBoard extends Component{
       currentGamePointer: 0,
       playerOneName: 'Player One',
       playerTwoName: 'Player Two',
-      updatedFromServer: false
+      workingOffline: false,
+      couldLoad: true
     }
   }
 
   componentDidMount() {
     const { id } = this.props.match.params;
     (async function() {
-      const [result] = await getGameById(id);
-      const { gameStatus } = result;
-      if (gameStatus === 'PENDING') {
-        console.log('UPDATING PENDING GAME TO CURRENT');
-        const result = await updateGameStatus('CURRENT', id);
-        console.log(result);
-        this.setGameStateFromAPI(result);
-      } else {
-        this.setGameStateFromAPI(result)
+      try {
+        const [result] = await getGameById(id);
+        const { gameStatus } = result;
+        if (gameStatus === 'PENDING') {
+          console.log('UPDATING PENDING GAME TO CURRENT');
+          const result = await updateGameStatus('CURRENT', id);
+          console.log(result);
+          this.setGameStateFromAPI(result);
+        } else {
+          this.setGameStateFromAPI(result)
+        }
+
+      } catch(error) {
+        console.log(error);
+        this.setState({ couldLoad: false });
       }
     }).bind(this)();
   }
@@ -78,7 +85,16 @@ export default class GameBoard extends Component{
     const currentGamePointer = historyGame.length > 0 ? historyGame.length - 1 : 0;
     const gameFinished = gameStatus === 'FINISHED';
     const winner = result.winner;
-    this.setState({ playerOneName, playerTwoName, historyGame, currentGame, currentGamePointer, gameFinished, winner });
+    this.setState({ 
+      playerOneName, 
+      playerTwoName, 
+      historyGame, 
+      currentGame, 
+      currentGamePointer, 
+      gameFinished, 
+      winner,
+      couldLoad: true
+     });
   }
 
   handleSquareClick(index) {
@@ -105,6 +121,7 @@ export default class GameBoard extends Component{
         console.log('at update', result);
         this.setGameStateFromAPI(result);
       } catch (error) {
+        this.setState({ workingOffline: true });
         console.log('something went wrong... working locally');
       }
     }).bind(this)();
@@ -157,7 +174,8 @@ export default class GameBoard extends Component{
     ? this.state.winner === 'Player1' ? this.state.playerOneName: this.state.playerTwoName : null;
     const header = winner ? `Winner is: ${ winner }` : 
     this.state.gameFinished ? 'Game finished' : `Turn For: ${ this.state.isPlayerOneturn ? 'X' : 'O' }`
-    return(
+    const { couldLoad, workingOffline } = this.state;
+    return couldLoad ? (
       <div className = "container">
         <Link to="/" onClick = {(e) => this.handleExitClick(e)}>Go Menú</Link>
         <Link to="/start">{this.state.gameFinished && 'Start New Game'}</Link>
@@ -183,6 +201,7 @@ export default class GameBoard extends Component{
               </div>
             </div>
           </div>
+          { workingOffline &&  <h3 className = "text-center text-danger">Working offline</h3> }
           <div className='game-history mt-3'>
             <ul className = "list-group ">
               { this.state.historyGame.map((element, index) => {
@@ -198,7 +217,7 @@ export default class GameBoard extends Component{
           </div>
         </div>
       </div>
-    )
+    ) : (<Redirect to = "/"/>)
   }
   
 }

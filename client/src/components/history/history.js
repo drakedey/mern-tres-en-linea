@@ -71,7 +71,8 @@ class History extends Component {
   fetchGameByParams(status) {
     return (async function() {
       try {
-        const history = await getGamesByGameStatus(status);
+        let history = await getGamesByGameStatus(status);
+        history = history ? history : [];
         this.setState({ history });
         return history;
       } catch (error) {
@@ -107,7 +108,7 @@ class History extends Component {
       return(
         <div className ="container">
           <Link to="/">Go Back</Link>
-          <Menu selected = { this.state.currentQuery } {...this.props}/>
+          <Menu selected = { this.state.status } {...this.props}/>
           <div className="mt-5" id="history-list">
             { history.length > 0 ? 
               history.map( (el, i) => this.renderHistoryList(el, i))
