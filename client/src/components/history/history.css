@@ -1,0 +1,12 @@
+.parent {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  padding: 5%;
+}
+
+#history-list {
+  border-radius: 2px;
+  max-height: 500px;
+  overflow: auto;
+}
