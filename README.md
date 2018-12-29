@@ -8,7 +8,7 @@ complete the instructions especifed in this README file.
 
 ## Requirements.
 
-In order to complete all the steps described you need the following thigs installed on yout pc:
+In order to complete all the steps described you need the following things installed on your pc:
 
 1. Node.js and npm go to the web page (https://nodejs.org/en/) and download the installer.
 2. MongoDB to connect to DB.
@@ -27,7 +27,7 @@ In order to complete all the steps described you need the following thigs instal
 
 ## Considerations.
 
-The server side of the aplication is by default configured to listen on 127.0.0.1 or localhost on port 500
-make sure that you have that port free and dont have PORT enviroment variable asigned to a diferent number.
+The server side of the aplication is by default configured to listen on 127.0.0.1 or localhost on port 5000 
+make sure that you have that port free and dont have PORT enviroment variable asigned to a diferent number and the server is listening port 3000 for requests, make sure that client is running in that port.
 If you experiment troubles with the aplication make sure to check this considerations
 
